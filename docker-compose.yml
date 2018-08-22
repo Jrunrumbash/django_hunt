@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:10.4-alpine
+    environment:
+      POSTGRES_USER: hunt_db
+      POSTGRES_PASSWORD: hunt_db
+    volumes:
+      - "django_db:/var/lib/postgresql/data"
+  web:
+    build: .
+    command: bash -c "python3 manage.py migrate && python3 manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+
+volumes:
+  django_db:

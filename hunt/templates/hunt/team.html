@@ -1,0 +1,20 @@
+<h1>{{team.name}}</h1>
+
+{% if error_message%}<p><strong>{{ error_message }}</strong></p>{% endif %}
+<ul>
+    {% for clue_state in team.cluestate_set.all %}
+    {% if clue_state.solved %}
+    <li><a href="{% url 'hunt:clue' clue_state.clue.id %}">{{clue_state.clue.name }}</a></li>
+    {% else %}
+    <li>
+        <form action="{% url 'hunt:decrypt' team.name %}" method="post">
+            {% csrf_token %}
+            <label for="clue{{ forloop.counter }}">{{ clue_state.clue.hash }}</label>
+            <input type="text" name="decrypt_code" id="clue{{ forloop.counter }}" value="decryption key required" />
+            <input type="hidden" name="clue_id" value="{{ clue_state.clue.id }}">
+        </form>
+    </li>
+    {% endif %}
+    {% endfor %}
+</ul>
+
