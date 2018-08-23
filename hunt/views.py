@@ -2,10 +2,12 @@ from django.shortcuts import render, get_object_or_404
 from django.views import generic
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.urls import reverse
+from django.utils import timezone
 
 # Create your views here.
 
 from .models import Clue, Team, ClueState
+from .forms import PlayerForm, NameForm
 
 
 class TeamView(generic.DetailView):
@@ -13,7 +15,7 @@ class TeamView(generic.DetailView):
     template_name = 'hunt/team.html'
 
 
-class Clue(generic.DetailView):
+class ClueView(generic.DetailView):
     model = Clue
     template_name = 'hunt/clue.html'
 
@@ -46,3 +48,20 @@ def decrypt(request, team_name):
                 'error_message': 'Failed to decrypt!',
             })
     return HttpResponseRedirect(reverse('hunt:team', args=(team_name,)))
+
+def register(request):
+    if request.method == 'POST':
+        form = PlayerForm(request.POST)
+        
+        if form.is_valid():
+            new_team = Team()
+            new_team.name = form.cleaned_data['name']
+            new_team.email = form.cleaned_data['email']
+            new_team.password = form.cleaned_data['password1']
+            new_team.creation_date = timezone.now()
+            new_team.save()
+            return HttpResponseRedirect(reverse('hunt:team', args=(new_team.name,)))
+    else:
+        form = PlayerForm()
+        
+    return render(request, 'hunt/addTeam.html', {'form': form})

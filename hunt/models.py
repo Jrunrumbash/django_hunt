@@ -4,6 +4,8 @@ from django.db import models
 
 class Team(models.Model):
     name = models.CharField(max_length=200, primary_key=True)
+    email = models.CharField(max_length=200, default='default_email')
+    password = models.CharField(max_length=200, default='password')
     creation_date = models.DateTimeField('date published')
 
     #TODO add a method for winning the game
